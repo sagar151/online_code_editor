@@ -24,10 +24,12 @@ app.post("/run",async(req,res)=>{
         return res.status(400).json({success:false,error:'code is empty'})
     }
     
-        const filePath=await generateFile(language,code);
+        const filepath=await generateFile(language,code);
+        console.log("filepath indexJs",filepath);
         // const jsoutput=await executeJS(filePath)
-        const job=await new Job({language,filePath}).save();
+        const job=await new Job({language,filepath}).save();
         const jobId=await job["_id"];
+        console.log("jobid",job);
         addJobToQueue(jobId);
         res.status(201).json({jobId})
     

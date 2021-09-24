@@ -6,30 +6,33 @@ const {executePy}=require("./executePy")
 // const { model } = require("mongoose");
 
 const jobQueue=new Queue("job-runner-queue");
+
 jobQueue.process(5,async({data})=>{
     const jobId=data.id;
-    const Job=Job.findById(jobId);
+    const job= await Job.findById(jobId);
+    console.log("JOb in queue",Job)
     try {
+
         let output;
-        Job["startedAt"]=new Date;
-        if (Job.language==="cpp") {
-            output=await executeCpp(Job.filepath);
+        job["startedAt"]=new Date;
+        if (job.language==="cpp") {
+            output=await executeCpp(job.filepath);
         }
-        else if (Job.language==="js") {
-            output=await executeJS(Job.filepath);
+        else if (job.language==="js") {
+            output=await executeJS(job.filepath);
         }
         else {
-            output=await executePy(Job.filepath)
+            output=await executePy(job.filepath)
         }
-        Job["createdAt"]=new Date();
-        Job["output"]=output;
-        Job["status"]="success";
-        await Job.save();
+        job["createdAt"]=new Date();
+        job["output"]=output;
+        job["status"]="success";
+        await job.save();
         
     } catch (error) {
-        Job["competedAt"]=new Date();
-        Job["output"]=JSON.stringify(error);
-        Job["status"]="error"
+        job["competedAt"]=new Date();
+        job["output"]=JSON.stringify(error);
+        job["status"]="error"
         throw Error(JSON.stringify(error))
     }
 })
