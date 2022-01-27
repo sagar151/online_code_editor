@@ -5,6 +5,7 @@ const Job=require('./models/Job')
 const app=express();
 const {addJobToQueue}=require("./jobQueue")
 const {generateFile}=require('./generateFile');
+require("dotenv").config
 // const {executeJS}=require('./executeJS')
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
@@ -47,6 +48,6 @@ app.get("/status",async(req,res)=>{
     return res.status(200).json({success:true,job})
 })
 
-app.listen(8080,()=>{
+app.listen(process.env.PORT || 3000,()=>{
     console.log('port is 8080');
 })
